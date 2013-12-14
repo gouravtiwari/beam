@@ -1,7 +1,16 @@
 # Beam
 
+## Usage
 1. Add it to the model you want to import csv file
-2. upload csv file by Model.upload_file(upload_file_obj, file_path, callback_method = "parse")
+
+
+    extend Beam::Upload
+
+
+2. upload zipped csv file, e.g.
+
+
+    Model.upload_file(file_name, file_path)
 
 ## Contributing
 
@@ -10,5 +19,3 @@
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-
