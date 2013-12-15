@@ -1,5 +1,4 @@
 require 'csv'
-require 'zip'
 module Beam
   module Upload
     def upload_file(file_name, file_path, callback_method = "parse")
