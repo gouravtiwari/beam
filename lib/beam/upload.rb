@@ -28,8 +28,7 @@ module Beam
     end
 
     def parse(file_name, file_path)
-      response  = { errors: 0, status: 200, total_rows: 0}
-      error_rows= []
+      response  = { errors: 0, status: 200, total_rows: 0, error_rows: []}
       index = 0
 
       begin
@@ -39,12 +38,14 @@ module Beam
           response[:total_rows] += 1
           begin
             data, response[:errors], error_row = validate_data(response[:errors], row_hash, index)
-            error_rows << error_row if error_row
-
-            data.save!
+            if error_row
+              response[:error_rows] << error_row
+            else
+              data.save!
+            end
           rescue Exception => e
             response[:errors] +=1
-            error_rows << log_and_return_error(row_hash, e, index)
+            response[:error_rows] << log_and_return_error(row_hash, e, index)
           end
         end
       rescue Exception => e
@@ -62,7 +63,7 @@ module Beam
     end
 
     def log_and_return_error(row_hash, e, index)
-      Rails.logger.error("Error on #{index}: \n #{row_hash.values} \n#{e.backtrace}")
+      Rails.logger.error e.formatted_exception("Error on #{index}: \n #{row_hash.values}")
       row_hash.values + [invalid_file_message]
     end
 
