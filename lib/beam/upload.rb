@@ -6,13 +6,17 @@ module Beam
     #       file_path:        path/to/zip-file, e.g. Rails.root/tmp
     #       error_file_needed:true if you need error file to be created, default is true
     #       callback_method:  method which does the job to load records, default is parse method
-    def upload_file(file_name, file_path, error_file_needed=true, callback_method = "parse")
+    #       batch_process:    defailt is true, set to false if you do not use activerecord-import 
+    #                         for batch processing
+    def upload_file(file_name, file_path, error_file_needed=true, callback_method = "parse", batch_process=true)
       status = {}
-      @file_name = file_name
-      @file_path = file_path
+      @file_name          = file_name
+      @file_path          = file_path
       @error_file_needed  = error_file_needed
       @original_zip_file  = "#{@file_path}/#{@file_name}"
       @csv_file_name      = @file_name.gsub(/\.zip/,'')
+      @batch_process      = batch_process
+      @batch_size         = 1_1000
 
       begin
         delete_csv_if_present
@@ -59,11 +63,12 @@ module Beam
     end
 
     # parses the csv file, creates record for the model and returns response hash,e.g.
-    # {:errors=>1, :status=>200, :total_rows=>4, :error_rows=>[["Test1", nil, "is invalid"]]}
+    # \{:errors=>1, :status=>200, :total_rows=>4, :error_rows=>[["Test1", nil, "is invalid"]]\}
     # also, it creates error file to consume
     def parse
       response  = { errors: 0, status: 200, total_rows: 0, error_rows: []}
       index = 0
+      batch = []
 
       begin
         CSV.foreach("#{@file_path}/#{@csv_file_name}", :encoding => 'iso-8859-1:UTF-8', headers: true) do |row|
@@ -72,8 +77,10 @@ module Beam
           response[:total_rows] += 1
           begin
             record, response[:errors], error_row = validate_record(response[:errors], row_hash, index)
-            if error_row
-              response[:error_rows] << error_row
+            response[:error_rows] << error_row if error_row
+              
+            if @batch_process
+              batch = add_to_batch(batch, record)
             else
               record.save!
             end
@@ -82,6 +89,7 @@ module Beam
             response[:error_rows] << log_and_return_error(row_hash, e, index)
           end
         end
+        import_from_batch(batch)
       rescue Exception => e
         response[:errors] = 1
         log_and_return_error({}, e, '')
@@ -94,6 +102,19 @@ module Beam
       end
 
       response
+    end
+
+    def add_to_batch(batch, record)
+      batch << record if record
+      if batch.size >= @batch_size
+        import_from_batch(batch, true)
+        batch = []
+      end
+      batch
+    end
+
+    def import_from_batch(batch)
+      import(batch, :validate => false) if @batch_process
     end
 
     def log_and_return_validation_error(record, row_hash, index)
