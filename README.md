@@ -1,16 +1,30 @@
 # Beam
 
-A rubygem to simplifiy repetitive csv upload process for ActiveRecord models
+A rubygem to simplifiy repetitive csv upload process for ActiveRecord models. 
+Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activerecord-import)
 
 ## Usage
 
-1. Add it to the model you want to import csv file
+1. Add it the application's Gemfile:
+    ```ruby
+    gem 'beam'
+    ```
+    
+    Add [activerecord-import gem](http://rubygems.org/gems/activerecord-import) to the application's Gemfile:
+    
+    ```ruby
+    gem 'activerecord-import', '0.4.1' # for rails-4.1 app
+    gem 'activerecord-import', '0.4.0' # for rails-4.0 app
+    gem 'activerecord-import', '0.3.1' # for rails-3.1+ app
+    ```
+
+2. Add it to the model you want to import csv file
     
     ```ruby
     extend Beam::Upload
     ```
 
-2. Upload zipped csv file, e.g. users.csv.zip
+3. Upload zipped csv file, e.g. users.csv.zip
   
     ```ruby
     Model.upload_file(file_name, file_path)
@@ -23,13 +37,14 @@ A rubygem to simplifiy repetitive csv upload process for ActiveRecord models
     # Test4,test4@test.com
     ```
 
-3. Get the output as:
+4. Get the output as:
   
     ```ruby
     # response hash, e.g. 
       {:errors=>1, :status=>200, :total_rows=>4, :error_rows=>[["Test1", nil, "is invalid"]]}
     # error file, e.g.
       for users.csv file, it creates errors_users.csv at the same path
+    # see records being saved in batch(by default) of 1_000 with activerecord-import gem
     ```
 
 See beam/upload.rb for more details
