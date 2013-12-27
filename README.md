@@ -1,6 +1,6 @@
 # Beam
 
-A rubygem to simplifiy repetitive csv upload process for ActiveRecord models. 
+A rubygem to simplifiy repetitive csv upload process for ActiveRecord models in rails applications. 
 Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activerecord-import)
 
 ## Usage
@@ -8,6 +8,18 @@ Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activer
 1. Add it the application's Gemfile:
     ```ruby
     gem 'beam'
+    ```
+
+    Run the generator
+
+    ```ruby
+    rails g beam:install
+    ```
+
+    This will create a config file for you to over-ride default options of upload process.
+
+    ```ruby
+    create  config/initializers/beam.rb
     ```
     
     Add [activerecord-import gem](http://rubygems.org/gems/activerecord-import) to the application's Gemfile:
@@ -48,6 +60,10 @@ Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activer
     ```
 
 See beam/upload.rb for more details
+
+## TO DO
+
+SPECS!
 
 ## Contributing
 

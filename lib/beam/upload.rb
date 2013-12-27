@@ -1,24 +1,48 @@
 require 'csv'
+
 module Beam
+    # error_file_needed:true if you need error file to be created, default is true
+    # batch_process:    default is true, set to false if you do not use activerecord-import 
+    #                   for batch processing
+    # batch_size:       default is 1_000, change it to batch of records you want to upload
+    # zipped:           set it to true if uploaded file is zipped
+    @config = {
+      error_file_needed:  true,
+      batch_process:      true,
+      batch_size:         1_000,
+      zipped:             true
+    }
+
+    @valid_config_keys = @config.keys
+
+    # Configure through hash
+    def self.configure(opts = {})
+      opts.each {|k,v| @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym}
+    end
+
+    def self.config
+      configure(@config)
+    end
+
   module Upload
+    def upload_config
+      @error_file_needed  = Beam.config[:error_file_needed]
+      @batch_process      = Beam.config[:batch_process]
+      @batch_size         = Beam.config[:batch_size]
+      @zipped             = Beam.config[:zipped]
+    end
+
     # params:
     #       file_name:        zip file name, e.g. users.csv.zip
     #       file_path:        path/to/zip-file, e.g. Rails.root/tmp
-    #       error_file_needed:true if you need error file to be created, default is true
     #       callback_method:  method which does the job to load records, default is parse method
-    #       batch_process:    defailt is true, set to false if you do not use activerecord-import 
-    #                         for batch processing
-    #       zipped:           set it to true if uploaded file is zipped
-    def upload_file(file_name, file_path, error_file_needed=true, callback_method = "parse", batch_process=true, zipped=true)
+    def upload_file(file_name, file_path, callback_method='parse')
       status = {}
+      upload_config
       @file_name          = file_name
-      @file_path          = file_path
-      @error_file_needed  = error_file_needed
+      @file_path          = file_path      
       @original_zip_file  = "#{@file_path}/#{@file_name}"
       @csv_file_name      = @file_name.gsub(/\.zip/,'')
-      @batch_process      = batch_process
-      @batch_size         = 1_000
-      @zipped             = zipped
 
       begin
         if @zipped
@@ -35,6 +59,7 @@ module Beam
       status
     end
 
+    # unzips a zipped-csv-file in a given directory
     def unzip_file
       `unzip #{@file_path}/#{@file_name} -d #{@file_path}`
     end
