@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email          = ["gouravtiwari21@gmail.com"]
   spec.homepage       = "https://github.com/gouravtiwari/beam"
   spec.summary        = "CSV uploader library for fast and easy upload"
-  spec.description    = "CSV uploader library for fast and easy upload"
+  spec.description    = "CSV uploader library for fast and easy upload for Rails applications"
   spec.license        = "MIT"
 
   spec.files          = `git ls-files`.split($/)
