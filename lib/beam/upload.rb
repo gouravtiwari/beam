@@ -8,7 +8,8 @@ module Beam
     #       callback_method:  method which does the job to load records, default is parse method
     #       batch_process:    defailt is true, set to false if you do not use activerecord-import 
     #                         for batch processing
-    def upload_file(file_name, file_path, error_file_needed=true, callback_method = "parse", batch_process=true)
+    #       zipped:           set it to true if uploaded file is zipped
+    def upload_file(file_name, file_path, error_file_needed=true, callback_method = "parse", batch_process=true, zipped=true)
       status = {}
       @file_name          = file_name
       @file_path          = file_path
@@ -16,12 +17,15 @@ module Beam
       @original_zip_file  = "#{@file_path}/#{@file_name}"
       @csv_file_name      = @file_name.gsub(/\.zip/,'')
       @batch_process      = batch_process
-      @batch_size         = 1_1000
+      @batch_size         = 1_000
+      @zipped             = zipped
 
       begin
-        delete_csv_if_present
-        `unzip #{@file_path}/#{@file_name} -d #{@file_path}`
-
+        if @zipped
+          delete_csv_if_present
+          unzip_file
+        end
+        
         status = self.send(callback_method)
       rescue Exception =>  e
         error_in_upload([[invalid_file_message]]) if @error_file_needed
@@ -29,6 +33,10 @@ module Beam
         status = { errors: 1, status: 500}
       end
       status
+    end
+
+    def unzip_file
+      `unzip #{@file_path}/#{@file_name} -d #{@file_path}`
     end
 
     # deletes csv file upfront before we unzip the file
