@@ -125,7 +125,8 @@ module Beam
         import_from_batch(batch)
       rescue Exception => e
         response[:errors] = 1
-        log_and_return_error({}, e, '')
+        response[:error_rows] = log_and_return_error({}, e, '')
+        response[:status] = 500
       end
 
       if response[:error_rows].blank?
