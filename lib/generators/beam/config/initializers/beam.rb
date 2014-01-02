@@ -1,9 +1,5 @@
-module Beam
-  # @config = {
-  #     error_file_needed:  true,
-  #     batch_process:      true,
-  #     batch_size:         1_000,
-  #     zipped:             false
-  #     data_upload_path:   "#{Rails.root}/tmp"
-  #   }
-end
+# Beam.config[:error_file_needed] = true
+# Beam.config[:batch_process]     = true
+# Beam.config[:batch_size]        = 1_000
+# Beam.config[:zipped]            = true
+# Beam.config[:data_upload_path]  = "#{Rails.root}/tmp"

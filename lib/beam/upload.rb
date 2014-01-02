@@ -6,23 +6,13 @@ module Beam
     #                   for batch processing
     # batch_size:       default is 1_000, change it to batch of records you want to upload
     # zipped:           set it to true if uploaded file is zipped
-    @config = {
+    mattr_accessor :config
+    @@config = {
       error_file_needed:  true,
       batch_process:      true,
       batch_size:         1_000,
       zipped:             true
     }
-
-    @valid_config_keys = @config.keys
-
-    # Configure through hash
-    def self.configure(opts = {})
-      opts.each {|k,v| @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym}
-    end
-
-    def self.config
-      configure(@config)
-    end
 
   module Upload
     def upload_config
@@ -35,7 +25,7 @@ module Beam
     # params:
     #       file_name:        zip file name, e.g. users.csv.zip
     #       file_path:        path/to/zip-file, e.g. Rails.root/tmp
-    #       callback_method:  method which does the job to load records, default is parse method
+    #       callback_method:  method which does the job to parse CSV and load records, default is parse method
     def upload_file(file_name, file_path, callback_method='parse')
       status = {}
       upload_config
