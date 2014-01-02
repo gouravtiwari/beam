@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-bundler"
   spec.add_development_dependency "rb-fsevent"
   spec.add_development_dependency "shoulda-matchers"
-  spec.add_development_dependency "debugger"
-  spec.add_development_dependency "debugger-ruby_core_source"
+  spec.add_development_dependency "debugger", "~> 1.6.5"
   spec.add_development_dependency "coveralls"
 end
