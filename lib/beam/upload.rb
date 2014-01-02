@@ -6,12 +6,14 @@ module Beam
     #                   for batch processing
     # batch_size:       default is 1_000, change it to batch of records you want to upload
     # zipped:           set it to true if uploaded file is zipped
+    # data_upload_path: should be set to Rails.root + '/tmp'
     mattr_accessor :config
     @@config = {
       error_file_needed:  true,
       batch_process:      true,
       batch_size:         1_000,
-      zipped:             true
+      zipped:             true,
+      data_upload_path:   Rails.root ? Rails.root + '/tmp' : Beam.tmp
     }
 
   module Upload

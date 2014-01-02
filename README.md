@@ -31,13 +31,27 @@ Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activer
     gem 'activerecord-import', '0.3.1' # for rails-3.1+ app
     ```
 
-2. Add it to the model you want to import csv file
+2. If you would like to use upload_controller_methods (to help you upload files csv/zipped) include below routes in config/routes.rb (for fake_controller):
+    ```ruby
+    post "fake/upload", to: "fake#upload"
+    get  "fake/error_file", to: "fake#error_file"
+    ```
+    and include these methods in the controller:
+    ```ruby
+    class FakeController < ApplicationController
+      include Beam::UploadControllerMethods
+    end
+    ...
+    ...
+    ```
+
+3. Add it to the model you want to import csv file
     
     ```ruby
     extend Beam::Upload
     ```
 
-3. Upload zipped csv file, e.g. users.csv.zip
+4. Upload zipped csv file, e.g. users.csv.zip
   
     ```ruby
     Model.upload_file(file_name, file_path)
@@ -50,7 +64,7 @@ Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activer
     # Test4,test4@test.com
     ```
 
-4. Get the output as:
+5. Get the output as:
   
     ```ruby
     # response hash, e.g. 

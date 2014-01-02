@@ -12,9 +12,8 @@ module Beam
     end
 
     def error_file
-      send_file "#{Beam.config[:data_upload_path]}/#{self.controller_name.camelize}Errors.xlsx"
+      send_file "#{Beam.config[:data_upload_path]}/#{self.controller_name.downcase}_errors.csv"
     end
-
     
     def self.included(base)
       private
@@ -33,7 +32,8 @@ module Beam
 
         status = file_obj ? file_status(file_obj) : not_file_status
         status[:message] = status[:num_errors] && status[:num_errors].zero? ? status[:success_msg] : status[:error_msg]
-        status[:status] = "success"
+        status[:status] = status[:message] == status[:success_msg] ? "success" : "failure"
+        status[:status_code] = status[:message] == status[:success_msg] ? 200 : 500
         status
       end
 
@@ -53,8 +53,8 @@ module Beam
       def upload_file(file)
         @model ||= controller_name.classify.constantize
         @upload_method ? 
-          @model.upload_file(file, @upload_method) :
-          @model.upload_file(file)
+          @model.upload_file(file, Beam.config[:data_upload_path], @upload_method) :
+          @model.upload_file(file, Beam.config[:data_upload_path])
       end
 
       def not_csv_file_status
@@ -65,14 +65,9 @@ module Beam
         if response[:status] == 500
           failure_status
         else
-          status_msg = if AppConfig::upload_through_queue
-                        upload_through_queue_status(response[:errors])
-                      else
-                        response[:errors].zero? ? 
-                          upload_without_queue_success_status :
-                          upload_without_queue_failure_status(response[:errors])
-                      end
-          status_msg.merge(@model.data_upload_status(@upload_method))
+        response[:errors].zero? ? 
+          upload_without_queue_success_status :
+          upload_without_queue_failure_status(response[:errors])
         end
       end
 

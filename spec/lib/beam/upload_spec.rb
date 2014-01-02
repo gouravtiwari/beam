@@ -1,6 +1,6 @@
 require 'active_record'
 require 'spec_helper'
-require_relative '../../../lib/beam/upload'
+require_relative Beam.lib+'/beam/upload'
 
 describe Beam::Upload do
   context "zipped file" do
