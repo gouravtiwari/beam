@@ -1,4 +1,5 @@
 # Beam
+[![Gem Version](https://badge.fury.io/rb/beam.png)](http://badge.fury.io/rb/beam) [![Build Status](https://travis-ci.org/gouravtiwari/beam.png?branch=master)](https://travis-ci.org/gouravtiwari/beam) [![Coverage Status](https://coveralls.io/repos/gouravtiwari/beam/badge.png?branch=master)](https://coveralls.io/r/gouravtiwari/beam?branch=master)
 
 A rubygem to simplifiy repetitive csv upload process for ActiveRecord models in rails applications. 
 Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activerecord-import)
