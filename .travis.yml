@@ -6,4 +6,5 @@ rvm:
 env:
   - DB=sqlite
 script:
+  - bundle exec rake db:migrate
   - bundle exec rake spec

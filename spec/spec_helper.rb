@@ -25,3 +25,9 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
+
+class User < ActiveRecord::Base
+  extend Beam::Upload
+
+  validates :email, presence: true
+end

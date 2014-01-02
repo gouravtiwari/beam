@@ -2,10 +2,6 @@ require 'active_record'
 require 'spec_helper'
 require_relative '../../../lib/beam/upload'
 
-class User < ActiveRecord::Base
-  extend Beam::Upload
-end
-
 describe Beam::Upload do
   context "zipped file" do
     it 'should not upload anything and return error, when file is not present' do
@@ -16,7 +12,11 @@ describe Beam::Upload do
                                                                           }
     end
 
-    it 'should upload zipped csv file when file is present'
+    it 'should upload zipped csv file when file is present' do
+      `cp -f #{Beam.spec}/fixturesspec/users.csv.zip #{Beam.tmp}`
+      response = User.upload_file("users.csv.zip", Beam.tmp)
+      response[:status].should == 200
+    end
   end
 
   context "CSV file" do
@@ -34,17 +34,34 @@ describe Beam::Upload do
                                                                           }
     end
 
-    it 'should upload zipped csv file when file is present'
+    it 'should upload csv file when file is present' do
+      `cp -f #{Beam.spec}/fixturesspec/users.csv #{Beam.tmp}`
+      response = User.upload_file("users.csv", Beam.tmp)
+      response[:status].should == 200
+    end
   end
 
   context "validation" do
-    it 'should upload file and return validation error'
-    it 'should upload file and return validation error CSV file'
-    it 'should upload file and return success'
-  end
+    it 'should upload file and return validation error' do
+      `cp -f #{Beam.spec}/fixturesspec/users_with_errors.csv.zip #{Beam.tmp}`
+      response = User.upload_file("users_with_errors.csv.zip", Beam.tmp)
+      response[:errors].should == 1
+      response[:error_rows].should == [["Test1", nil, "can't be blank"]]
+    end
 
-  context "batch upload" do
-    it 'should upload file and create records in batches'
-    it 'should upload file and create records one-by-one'
+    it 'should upload file and return validation error CSV file' do
+      `cp -f #{Beam.spec}/fixturesspec/users_with_errors.csv.zip #{Beam.tmp}`
+      User.upload_file("users_with_errors.csv.zip", Beam.tmp)
+
+      File.exists?(Beam.tmp+"/errors_users_with_errors.csv").should be_true
+    end
+
+    it 'should upload file and return success response' do
+      `cp -f #{Beam.spec}/fixturesspec/users.csv.zip #{Beam.tmp}`
+      response = User.upload_file("users.csv.zip", Beam.tmp)
+      response[:status].should == 200
+      response[:errors].should == 0
+      response[:total_rows].should == 4
+    end
   end
 end

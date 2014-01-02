@@ -1,3 +1,5 @@
 /coverage
 /spec/dummy/log/*
-/tmp
+/tmp/*
+/spec/dummy/db/*.sqlite3
+Guardfile
