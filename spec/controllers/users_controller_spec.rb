@@ -20,7 +20,7 @@ describe UsersController do
   end
 
   it 'should send error file' do
-    expect(@controller).to receive(:send_file).with("#{Beam.config[:data_upload_path]}/users_errors.csv")
+    expect(@controller).to receive(:send_file).with("#{Beam.config[:data_upload_path]}/errors_users.csv")
     expect(@controller).to receive(:render)
 
     get :error_file
@@ -82,8 +82,14 @@ describe UsersController do
     end
 
     it 'should upload file and return success when uploaded with zero error' do
-      expect(@controller).to receive(:params).and_return({ upload: {upload_file: file=double(content_type: 'application/zip', original_filename: 'users.csv.zip')} })
-      expect(User).to receive(:upload_file).with(file, Beam.tmp).and_return(upload_response = {status: 200, errors: 0})
+      tempfile = fixture_file_upload(Beam.spec + '/fixturesspec/users.csv.zip', 'application/zip')
+      expect(@controller).to receive(:params).and_return({ upload: {
+                                                              upload_file: file=double(content_type: 'application/zip', 
+                                                              tempfile: tempfile,
+                                                              original_filename: 'users.csv.zip')
+                                                            } 
+                                                          })
+      expect(User).to receive(:upload_file).with('users.csv.zip', Beam.tmp).and_return(upload_response = {status: 200, errors: 0})
       expect(@controller).to receive(:zip_file?).with(file).and_return(true)
 
       post :upload, {upload: {upload_file: "some mock file"}}
@@ -101,8 +107,14 @@ describe UsersController do
     end
 
     it 'should upload file and return success when uploaded with > 0 error' do
-      expect(@controller).to receive(:params).and_return({ upload: {upload_file: file=double(content_type: 'application/zip', original_filename: 'users.csv.zip')} })
-      expect(User).to receive(:upload_file).with(file, Beam.tmp).and_return(upload_response = {status: 200, errors: 1})
+      tempfile = fixture_file_upload(Beam.spec + '/fixturesspec/users.csv.zip', 'application/zip')
+      expect(@controller).to receive(:params).and_return({ upload: {
+                                                              upload_file: file=double(content_type: 'application/zip', 
+                                                              tempfile: tempfile,
+                                                              original_filename: 'users.csv.zip')
+                                                            } 
+                                                          })
+      expect(User).to receive(:upload_file).with('users.csv.zip', Beam.tmp).and_return(upload_response = {status: 200, errors: 1})
       expect(@controller).to receive(:zip_file?).with(file).and_return(true)
       post :upload, {upload: {upload_file: "some mock file"}}
 

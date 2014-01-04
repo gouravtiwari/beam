@@ -47,6 +47,8 @@ module Beam
         error_in_upload([[invalid_file_message]]) if @error_file_needed
         Rails.logger.error e.formatted_exception("Uploading file #{@file_name} failed!")
         status = { errors: 1, status: 500}
+      ensure
+        File.delete @original_zip_file if File.exists?(@original_zip_file)
       end
       status
     end

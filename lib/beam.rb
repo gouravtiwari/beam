@@ -21,3 +21,4 @@ module Beam
 end
 
 require 'beam/upload'
+require 'beam/upload_controller_methods'

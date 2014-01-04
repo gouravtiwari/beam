@@ -3,16 +3,17 @@ module Beam
     attr_accessor :model, :upload_method  
 
     def upload
-      upload_status = file_upload_status(params)
-      upload_status.merge!(additional_params_on_success) if upload_status[:success_msg]
+      @upload_status = file_upload_status(params)
+      @upload_status.merge!(additional_params_on_success) if @upload_status[:success_msg]
 
       respond_to do |format|
-        format.json { render json: upload_status }
+        format.json { render json: @upload_status }
+        format.html { redirect_to :back }
       end
     end
 
     def error_file
-      send_file "#{Beam.config[:data_upload_path]}/#{self.controller_name.downcase}_errors.csv"
+      send_file "#{Beam.config[:data_upload_path]}/errors_#{self.controller_name.downcase}.csv"
     end
     
     def self.included(base)
@@ -23,8 +24,8 @@ module Beam
         {}
       end
 
-      def zip_file?(upload_file)
-        ["application/zip", "application/x-zip-compressed", "application/octet-stream"].include?(upload_file.content_type)  && upload_file.original_filename.include?(".zip")
+      def zip_file?(file)
+        ["application/zip", "application/x-zip-compressed", "application/octet-stream"].include?(file.content_type)  && file.original_filename.include?(".zip")
       end
 
       def file_upload_status(params)
@@ -51,10 +52,15 @@ module Beam
       end
 
       def upload_file(file)
+        require 'fileutils'
         @model ||= controller_name.classify.constantize
+        tmp = file.tempfile
+        file_path = File.join(Beam.config[:data_upload_path], file.original_filename)
+        FileUtils.cp_r tmp.path, file_path, remove_destination: true
+
         @upload_method ? 
-          @model.upload_file(file, Beam.config[:data_upload_path], @upload_method) :
-          @model.upload_file(file, Beam.config[:data_upload_path])
+          @model.upload_file(file.original_filename, Beam.config[:data_upload_path], @upload_method) :
+          @model.upload_file(file.original_filename, Beam.config[:data_upload_path])
       end
 
       def not_csv_file_status
