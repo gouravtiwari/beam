@@ -83,12 +83,15 @@ Supports bulk upload with [activerecord-import](http://rubygems.org/gems/activer
 
 ## Configuration options:
 
-Default configurations, to change these, update config/initializers/beam.rb:
-Beam.config[:error_file_needed] = true
-Beam.config[:batch_process]     = true
-Beam.config[:batch_size]        = 1_000
-Beam.config[:zipped]            = true
-Beam.config[:data_upload_path]  = "#{Rails.root}/tmp"
+1. Default configurations (to change these, update config/initializers/beam.rb)
+
+    ```ruby
+    Beam.config[:error_file_needed] = true
+    Beam.config[:batch_process]     = true
+    Beam.config[:batch_size]        = 1_000
+    Beam.config[:zipped]            = true
+    Beam.config[:data_upload_path]  = "#{Rails.root}/tmp"
+    ```
 
 
 ## TO DO
